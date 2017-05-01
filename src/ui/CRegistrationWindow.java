@@ -1,6 +1,5 @@
 package ui;
 
-import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -18,6 +17,7 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 
 import com.google.gson.JsonObject;
 
+import communication.CRequestBuilder;
 import utils.CUtils;
 
 public class CRegistrationWindow {
@@ -31,23 +31,6 @@ public class CRegistrationWindow {
 	JRadioButton rdbtnFemale = new JRadioButton("Female");
 		
 	private static final String REGISTRATION_URL = "http://192.168.1.4:8080/MyEmotionServlet/CRegisterServlet";
-	
-
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					CRegistrationWindow window = new CRegistrationWindow();
-					window.jRegistrationFrame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
 
 	/**
 	 * Create the application.
@@ -98,7 +81,7 @@ public class CRegistrationWindow {
 											
 						String body = jsonObj.toString();
 						
-						CUtils.executePost(REGISTRATION_URL, body);
+						CRequestBuilder.executePost(REGISTRATION_URL, body);
 					}
 				} catch (IOException e) {
 					// TODO Auto-generated catch block

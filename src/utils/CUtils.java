@@ -10,6 +10,11 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
+import ui.CWarningDialog;
+
 public class CUtils {
 	
 	public static String MD5(char[] md5) {
@@ -27,23 +32,5 @@ public class CUtils {
 			e.printStackTrace();
 		}
 		return null;
-	}
-	
-	public static String executePost(String targetURL, String body) throws IOException {
-		
-		try (CloseableHttpClient httpClient = HttpClientBuilder.create().build()) {
-			HttpPost request = new HttpPost(targetURL);
-			StringEntity params = new StringEntity(body);
-			request.addHeader("content-type", "application/json");
-			request.setEntity(params);
-			HttpResponse result = httpClient.execute(request);
-			
-			String json = EntityUtils.toString(result.getEntity(), "UTF-8");
-			System.out.println(json);
-			//Gson gson = new Gson();
-			//Response jsonResponse = gson.fromJson(json, Response.class);
-			
-		}				
-		return null;		
 	}
 }

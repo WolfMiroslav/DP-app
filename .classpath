@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="res"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jre1.8.0_121"/>
 	<classpathentry kind="lib" path="C:/Users/Mirec/Desktop/apache/commons-codec-1.9.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Mirec/Desktop/apache/commons-logging-1.2.jar"/>
@@ -13,5 +14,8 @@
 	<classpathentry kind="lib" path="C:/Users/Mirec/Desktop/apache/jna-4.1.0.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Mirec/Desktop/apache/jna-platform-4.1.0.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Mirec/Desktop/library/gson-2.8.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Mirec/Desktop/library/jackson-core-2.6.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Mirec/Desktop/library/jna-4.2.2.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Mirec/Desktop/library/jna-platform-4.2.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

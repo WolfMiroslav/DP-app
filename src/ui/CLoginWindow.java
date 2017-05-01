@@ -16,6 +16,7 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 
 import com.google.gson.JsonObject;
 
+import communication.CRequestBuilder;
 import utils.CUtils;
 
 public class CLoginWindow {
@@ -24,7 +25,7 @@ public class CLoginWindow {
 	private JTextField loginTextField;
 	private JPasswordField passwordTextField;
 	
-	private static final String LOGIN_URL = "http://192.168.1.4:8080/MyEmotionServlet/CLoginServlet";
+	private static final String LOGIN_URL = "http://localhost:8080/MyEmotionServlet/CLoginServlet";
 	
 	/**
 	 * Launch the application.
@@ -71,7 +72,7 @@ public class CLoginWindow {
 										
 					String body = jsonObj.toString();
 					
-					CUtils.executePost(LOGIN_URL, body);
+					CRequestBuilder.executePost(LOGIN_URL, body);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

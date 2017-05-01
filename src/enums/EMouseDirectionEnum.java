@@ -1,0 +1,13 @@
+package enums;
+
+public enum EMouseDirectionEnum 
+{
+	DEGREE_0_45,
+	DEGREE_45_90,
+	DEGREE_90_135,
+	DEGREE_135_180,
+	DEGREE_180_225,
+	DEGREE_225_270,
+	DEGREE_270_315,
+	DEGREE_315_360;
+}
