@@ -13,7 +13,7 @@ public class CKeyboardCharacteristicsFileWritter {
 	
 	private final static int EVENTS_COUNT = 10;
 		
-	public static void calculateCharacteristics(List<CEvent> keyboardEventsList) throws IOException
+	public static void calculateCharacteristics(List<CEvent> keyboardEventsList, List<Long> pauseTimeList, List<Long> windowSwitchedTimeList) throws IOException
 	{
 		double 	dwellTimeAvg = 0.0,
 				dwellTimeMin = Double.MAX_VALUE,
@@ -22,73 +22,117 @@ public class CKeyboardCharacteristicsFileWritter {
 		long 	digraphPP = 0, 
 				digraphPR = 0, 
 				digraphRP = 0, 
-				digraphRR = 0;
+				digraphRR = 0,
 		
-		long 	trigraphPP = 0, 
+				trigraphPP = 0, 
 				trigraphPR = 0, 
 				trigraphRP = 0, 
-				trigraphRR = 0;
+				trigraphRR = 0,
 		
-		long 	wordDigraphPP = 0, 
+				wordDigraphPP = 0, 
 				wordDigraphPR = 0, 
 				wordDigraphRP = 0, 
-				wordDigraphRR = 0;
+				wordDigraphRR = 0,
 		
-		long 	minDigraphPP = Long.MAX_VALUE, 
+				minDigraphPP = Long.MAX_VALUE, 
 				minDigraphPR = Long.MAX_VALUE, 
 				minDigraphRP = Long.MAX_VALUE, 
-				minDigraphRR = Long.MAX_VALUE;
+				minDigraphRR = Long.MAX_VALUE,
 		
-		long 	minTrigraphPP = Long.MAX_VALUE, 
+				minTrigraphPP = Long.MAX_VALUE, 
 				minTrigraphPR = Long.MAX_VALUE, 
 				minTrigraphRP = Long.MAX_VALUE, 
-				minTrigraphRR = Long.MAX_VALUE;
+				minTrigraphRR = Long.MAX_VALUE,
 		
-		long 	minWordDigraphPP = Long.MAX_VALUE, 
+				minWordDigraphPP = Long.MAX_VALUE, 
 				minWordDigraphPR = Long.MAX_VALUE, 
 				minWordDigraphRP = Long.MAX_VALUE, 
-				minWordDigraphRR = Long.MAX_VALUE;
+				minWordDigraphRR = Long.MAX_VALUE,
 		
-		long	maxDigraphPP = 0, 
+				maxDigraphPP = 0, 
 				maxDigraphPR = 0, 
 				maxDigraphRP = 0, 
-				maxDigraphRR = 0;
+				maxDigraphRR = 0,
 		
-		long 	maxTrigraphPP = 0, 
+				maxTrigraphPP = 0, 
 				maxTrigraphPR = 0, 
 				maxTrigraphRP = 0, 
-				maxTrigraphRR = 0;
+				maxTrigraphRR = 0,
 		
-		long 	maxWordDigraphPP = 0, 
+				maxWordDigraphPP = 0, 
 				maxWordDigraphPR = 0, 
 				maxWordDigraphRP = 0, 
-				maxWordDigraphRR = 0;
+				maxWordDigraphRR = 0,
 		
-		long 	avgDigraphPP = 0, 
+				avgDigraphPP = 0, 
 				avgDigraphPR = 0, 
 				avgDigraphRP = 0, 
-				avgDigraphRR = 0;
+				avgDigraphRR = 0,
 		
-		long 	avgTrigraphPP = 0, 
+				avgTrigraphPP = 0, 
 				avgTrigraphPR = 0, 
 				avgTrigraphRP = 0, 
-				avgTrigraphRR = 0;
+				avgTrigraphRR = 0,
 		
-		long 	avgWordDigraphPP = 0, 
+				avgWordDigraphPP = 0, 
 				avgWordDigraphPR = 0, 
 				avgWordDigraphRP = 0, 
-				avgWordDigraphRR = 0;
+				avgWordDigraphRR = 0,
 		
-		long 	startTimeStamp = 0;
-		int 	charPerSecond = 0;
+				startTimeStamp = 0,
+				
+				pauseTimesTotal = 0,
+				maxPauseTime = 0,
+				minPauseTime = Long.MAX_VALUE,
+				avgPauseTime = 0,
+				
+				maxWindowTime = 0,
+				minWindowTime = Long.MAX_VALUE,
+				avgWindowTime = 0;
 		
-		int 	charPerSecondMax = 0,
-				charPerSecondAvg = 0;
+		int 	charPerSecond = 0,
 		
-		int 	timesCharPerSecond = 0,
+				charPerSecondMax = 0,
+				charPerSecondAvg = 0,
+		
+				timesCharPerSecond = 0,
 				timesDigraph = 0,
-				timesTrigraph = 0;
+				timesTrigraph = 0,
+				timesWordgraph = 0,
+				
+				modifiersMax = 0,
+				modifiersTotal = 0,
+				
+				misstakesTotal = 0,
+				misstakesMax = 0,
 		
+				pauseCount = pauseTimeList.size(),
+				windowSwitchedCount = windowSwitchedTimeList.size();
+		
+		
+		for(int i=0; i<pauseTimeList.size(); i++)
+		{
+			pauseTimesTotal += pauseTimeList.get(i);
+			maxPauseTime = CParserUtils.getMax(maxPauseTime, pauseTimeList.get(i));
+			minPauseTime = CParserUtils.getMin(minPauseTime, pauseTimeList.get(i));
+		}		
+		
+		for(int i=0; i<windowSwitchedTimeList.size(); i++)
+		{
+			avgWindowTime += windowSwitchedTimeList.get(i);
+			maxWindowTime = CParserUtils.getMax(maxWindowTime, windowSwitchedTimeList.get(i));
+			minWindowTime = CParserUtils.getMin(minWindowTime, windowSwitchedTimeList.get(i));
+		}
+		
+		if(!pauseTimeList.isEmpty())
+		{
+			avgPauseTime = pauseTimesTotal / pauseTimeList.size();
+		}
+		
+		if(!windowSwitchedTimeList.isEmpty())
+		{
+			avgWindowTime = avgWindowTime/ windowSwitchedTimeList.size();
+		}		
 		
 		for(int i=0;i<keyboardEventsList.size();i++)
 		{
@@ -114,6 +158,21 @@ public class CKeyboardCharacteristicsFileWritter {
 					digraphRR = CParserUtils.getTimeBetween(((CKeyEvent) keyboardEventsList.get(i)).getKey(j).getReleasedTime(),
 							((CKeyEvent) keyboardEventsList.get(i)).getKey(j+1).getReleasedTime());
 					
+					minDigraphPP = CParserUtils.getMin(digraphPP, minDigraphPP);
+					minDigraphPR = CParserUtils.getMin(digraphPR, minDigraphPR);
+					minDigraphRP = CParserUtils.getMin(digraphRP, minDigraphRP);
+					minDigraphRR = CParserUtils.getMin(digraphRR, minDigraphRR);
+					
+					maxDigraphPP = CParserUtils.getMax(digraphPP, maxDigraphPP);
+					maxDigraphPR = CParserUtils.getMax(digraphPR, maxDigraphPR);
+					maxDigraphRP = CParserUtils.getMax(digraphRP, maxDigraphRP);
+					maxDigraphRR = CParserUtils.getMax(digraphRR, maxDigraphRR);
+					
+					avgDigraphPP += digraphPP;
+					avgDigraphPR += digraphPR;
+					avgDigraphRP += digraphRP;
+					avgDigraphRR += digraphRR;					
+					
 					if(startTimeStamp == 0)
 					{
 						startTimeStamp = ((CKeyEvent) keyboardEventsList.get(i)).getKey(j).getPressedTime();
@@ -131,6 +190,8 @@ public class CKeyboardCharacteristicsFileWritter {
 						
 						startTimeStamp = 0;
 					}
+					
+					
 				}
 				if((j+2) < ((CKeyEvent) keyboardEventsList.get(i)).getAllKeys().size())
 				{
@@ -148,6 +209,21 @@ public class CKeyboardCharacteristicsFileWritter {
 					trigraphRR = CParserUtils.getTimeBetween(((CKeyEvent) keyboardEventsList.get(i)).getKey(j).getReleasedTime(),
 							((CKeyEvent) keyboardEventsList.get(i)).getKey(j+2).getReleasedTime());
 					
+					minTrigraphPP = CParserUtils.getMin(trigraphPP, minTrigraphPP);
+					minTrigraphPR = CParserUtils.getMin(trigraphPR, minTrigraphPR);
+					minTrigraphRP = CParserUtils.getMin(trigraphRP, minTrigraphRP);
+					minTrigraphRR = CParserUtils.getMin(trigraphRR, minTrigraphRR);
+					
+					maxTrigraphPP = CParserUtils.getMax(trigraphPP, maxTrigraphPP);
+					maxTrigraphPR = CParserUtils.getMax(trigraphPR, maxTrigraphPR);
+					maxTrigraphRP = CParserUtils.getMax(trigraphRP, maxTrigraphRP);
+					maxTrigraphRR = CParserUtils.getMax(trigraphRR, maxTrigraphRR);
+					
+					avgTrigraphPP += trigraphPP;
+					avgTrigraphPR += trigraphPR;
+					avgTrigraphRP += trigraphRP;
+					avgTrigraphRR += trigraphRR;
+					
 					
 				}
 //				((CKeyEvent) keyboardEventsList.get(i)).getKey(j).getPressedTime();
@@ -157,6 +233,8 @@ public class CKeyboardCharacteristicsFileWritter {
 			
 			if((i+1) < keyboardEventsList.size())
 			{
+				timesWordgraph++;
+				
 				wordDigraphPP = CParserUtils.getTimeBetween(((CKeyEvent) keyboardEventsList.get(i)).getLastKey().getPressedTime()
 						, ((CKeyEvent) keyboardEventsList.get(i+1)).getFirstKey().getPressedTime());
 				
@@ -168,6 +246,21 @@ public class CKeyboardCharacteristicsFileWritter {
 				
 				wordDigraphRR = CParserUtils.getTimeBetween(((CKeyEvent) keyboardEventsList.get(i)).getLastKey().getReleasedTime()
 						, ((CKeyEvent) keyboardEventsList.get(i+1)).getFirstKey().getReleasedTime());
+				
+				minWordDigraphPP = CParserUtils.getMin(wordDigraphPP, minWordDigraphPP);
+				minWordDigraphPR = CParserUtils.getMin(wordDigraphPR, minWordDigraphPR);
+				minWordDigraphRP = CParserUtils.getMin(wordDigraphRP, minWordDigraphRP);
+				minWordDigraphRR = CParserUtils.getMin(wordDigraphRR, minWordDigraphRR);
+				
+				maxWordDigraphPP = CParserUtils.getMax(wordDigraphPP, maxWordDigraphPP);
+				maxWordDigraphPR = CParserUtils.getMax(wordDigraphPR, maxWordDigraphPR);
+				maxWordDigraphRP = CParserUtils.getMax(wordDigraphRP, maxWordDigraphRP);
+				maxWordDigraphRR = CParserUtils.getMax(wordDigraphRR, maxWordDigraphRR);
+				
+				avgWordDigraphPP += wordDigraphPP;
+				avgWordDigraphPR += wordDigraphPR;
+				avgWordDigraphRP += wordDigraphRP;
+				avgWordDigraphRR += wordDigraphRR;
 			}
 			
 			keyboardEventsList.size();
@@ -175,402 +268,205 @@ public class CKeyboardCharacteristicsFileWritter {
 			CParserUtils.getTimeBetween(((CKeyEvent) keyboardEventsList.get(i)).getLastKey().getReleasedTime()
 					, ((CKeyEvent) keyboardEventsList.get(i)).getFirstKey().getPressedTime());
 			
-			((CKeyEvent) keyboardEventsList.get(i)).getMisstakesCount();
-			((CKeyEvent) keyboardEventsList.get(i)).getModifiersCount();
+			misstakesTotal += ((CKeyEvent) keyboardEventsList.get(i)).getMisstakesCount();
+			misstakesMax = CParserUtils.getMax(misstakesMax, ((CKeyEvent) keyboardEventsList.get(i)).getMisstakesCount());
 			
-			// pocet znakov za sekundu
-			
+			modifiersTotal += ((CKeyEvent) keyboardEventsList.get(i)).getModifiersCount();
+			modifiersMax = CParserUtils.getMax(modifiersMax, ((CKeyEvent) keyboardEventsList.get(i)).getModifiersCount());
+									
 		}
+				
 		
-		
-		
-		
-		
-		
-		
-		int count = 0;
-		//boolean incomplete = false;
-		
-		String personName = null;
-		String wsession = null;
-		String emotion = null;
-		
-		
-		double avgAcceleration = 0;
-		double maxAcceleration = 0;
-		double minAcceleration = Double.MAX_VALUE;
-		
-		double avgAngleDifference = 0;
-		double maxAngleDifference = 0;
-		double minAngleDifference = Double.MAX_VALUE;
-		double maxAvgAngleDifference = 0;
-		
-		double avgLineDistance = 0;
-		double maxLineDistance = 0;
-		double minAvgLineDistance = Double.MAX_VALUE;
-		double maxAvgLineDistance = 0;
-		
-		double avgSpeed = 0;
-		double maxSpeed = 0;
-		double minSpeed = Double.MAX_VALUE;
-		
-		double avgDirectionChanges = 0;
-		int maxDirectionChanges = 0;
-		int minDirectionChanges = Integer.MAX_VALUE;
-		
-		double avgFirstClickHoldTime = 0;
-		long maxFirstClickHoldTime = 0;
-		long minFirstClickHoldTime = Long.MAX_VALUE;
-		
-		double avgIntersections = 0;
-		int maxIntersections = 0;
-		int minIntersections = Integer.MAX_VALUE;
-		
-		int maxMultiClicks = 0;
-		double avgMultiClicks = 0;
-		
-		double timeAvg = 0;
-		double timeMax = 0;
-		double timeMin = Double.MAX_VALUE;
-		
-		double avgClickMoveTime = 0;
-		long maxClickMoveTime = 0;
-		long minClickMoveTime = Long.MAX_VALUE;
-		
-		double avgMoveClickTime = 0;
-		long maxMoveClickTime = 0;
-		long minMoveClickTime = Long.MAX_VALUE;
-		
-		double avgMoveReleaseTime = 0;
-		long maxMoveReleaseTime = 0;
-		long minMoveReleaseTime = Long.MAX_VALUE;
-		
-		double avgReleaseMoveTime = 0;
-		long maxReleaseMoveTime = 0;
-		long minReleaseMoveTime = Long.MAX_VALUE;
 				
 		FileWriter writer = new FileWriter("result/newdata.csv");
 		writeFileHeaders(writer);
 		
-		for(int i=0; i<keyboardEventsList.size(); i++)
-		{
-			
-			if( i == 0 
-					|| (i>0	&& keyboardEventsList.get(i).getSession().equals(keyboardEventsList.get(i-1).getSession())
-					&& keyboardEventsList.get(i).getUserName().equals(keyboardEventsList.get(i-1).getUserName())
-					&& count <= EVENTS_COUNT))
-			{
-				personName = keyboardEventsList.get(i).getUserName();
-				wsession = keyboardEventsList.get(i).getSession();
-				emotion = keyboardEventsList.get(i).getEmotion().toString();				
-				
-				avgAcceleration += ((CMouseEvent) keyboardEventsList.get(i)).getAcceleration();
-				maxAcceleration = CParserUtils.getMax(maxAcceleration, ((CMouseEvent) keyboardEventsList.get(i)).getAcceleration());
-				minAcceleration = CParserUtils.getMin(minAcceleration, ((CMouseEvent) keyboardEventsList.get(i)).getAcceleration());
-				
-				avgAngleDifference += ((CMouseEvent) keyboardEventsList.get(i)).getAvgAngleDiff();
-				maxAngleDifference = CParserUtils.getMax(maxAngleDifference, ((CMouseEvent) keyboardEventsList.get(i)).getMaxAngleDiff());
-				minAngleDifference = CParserUtils.getMin(minAngleDifference, ((CMouseEvent) keyboardEventsList.get(i)).getAvgAngleDiff());
-				maxAvgAngleDifference = CParserUtils.getMax(maxAvgAngleDifference, ((CMouseEvent) keyboardEventsList.get(i)).getAvgAngleDiff());
-				
-				avgLineDistance += ((CMouseEvent) keyboardEventsList.get(i)).getAvgLineDistance();
-				maxLineDistance = CParserUtils.getMax(maxLineDistance, ((CMouseEvent) keyboardEventsList.get(i)).getMaxLineDistance());
-				minAvgLineDistance = CParserUtils.getMin(minAvgLineDistance, ((CMouseEvent) keyboardEventsList.get(i)).getMinLineDistance());
-				maxAvgLineDistance = CParserUtils.getMax(maxAvgLineDistance, ((CMouseEvent) keyboardEventsList.get(i)).getAvgLineDistance());
-				
-				avgSpeed += ((CMouseEvent) keyboardEventsList.get(i)).getAvgSpeed();
-				maxSpeed = CParserUtils.getMax(maxSpeed, ((CMouseEvent) keyboardEventsList.get(i)).getAvgSpeed());
-				minSpeed = CParserUtils.getMin(minSpeed, ((CMouseEvent) keyboardEventsList.get(i)).getAvgSpeed());
-				
-				avgDirectionChanges += ((CMouseEvent) keyboardEventsList.get(i)).getDirectionChanges();
-				maxDirectionChanges = CParserUtils.getMax(maxDirectionChanges, ((CMouseEvent) keyboardEventsList.get(i)).getDirectionChanges());
-				minDirectionChanges = CParserUtils.getMin(minDirectionChanges, ((CMouseEvent) keyboardEventsList.get(i)).getDirectionChanges());
-				
-				avgFirstClickHoldTime += ((CMouseEvent) keyboardEventsList.get(i)).getButtonHoldTime();
-				maxFirstClickHoldTime = CParserUtils.getMax(maxFirstClickHoldTime, ((CMouseEvent) keyboardEventsList.get(i)).getButtonHoldTime());
-				minFirstClickHoldTime = CParserUtils.getMin(minFirstClickHoldTime, ((CMouseEvent) keyboardEventsList.get(i)).getButtonHoldTime());
-				
-				avgIntersections += ((CMouseEvent) keyboardEventsList.get(i)).getIntersections();
-				maxIntersections = CParserUtils.getMax(maxIntersections, ((CMouseEvent) keyboardEventsList.get(i)).getIntersections());
-				minIntersections = CParserUtils.getMin(minIntersections, ((CMouseEvent) keyboardEventsList.get(i)).getIntersections());
-				
-				avgMultiClicks += ((CMouseEvent) keyboardEventsList.get(i)).getMultiClicks().size();
-				maxMultiClicks = CParserUtils.getMax(maxMultiClicks, ((CMouseEvent) keyboardEventsList.get(i)).getMultiClicks().size());
-				
-				timeAvg += ((CMouseEvent) keyboardEventsList.get(i)).getTime();
-				timeMax = CParserUtils.getMax(timeMax, ((CMouseEvent) keyboardEventsList.get(i)).getTime());
-				timeMin = CParserUtils.getMin(timeMin, ((CMouseEvent) keyboardEventsList.get(i)).getTime());
-				
-				avgClickMoveTime += ((CMouseEvent) keyboardEventsList.get(i)).getTimeClickMove();
-				maxClickMoveTime = CParserUtils.getMax(maxClickMoveTime, ((CMouseEvent) keyboardEventsList.get(i)).getTimeClickMove());
-				minClickMoveTime = CParserUtils.getMin(minClickMoveTime, ((CMouseEvent) keyboardEventsList.get(i)).getTimeClickMove());
-				
-				avgMoveClickTime += ((CMouseEvent) keyboardEventsList.get(i)).getTimeMoveClick();
-				maxMoveClickTime = CParserUtils.getMax(maxMoveClickTime, ((CMouseEvent) keyboardEventsList.get(i)).getTimeMoveClick());
-				minMoveClickTime = CParserUtils.getMin(minMoveClickTime, ((CMouseEvent) keyboardEventsList.get(i)).getTimeMoveClick());
-				
-				avgMoveReleaseTime += ((CMouseEvent) keyboardEventsList.get(i)).getTimeMoveRelease();
-				maxMoveReleaseTime = CParserUtils.getMax(maxMoveReleaseTime, ((CMouseEvent) keyboardEventsList.get(i)).getTimeMoveRelease());
-				minMoveReleaseTime = CParserUtils.getMin(minMoveReleaseTime, ((CMouseEvent) keyboardEventsList.get(i)).getTimeMoveRelease());
-				
-				avgReleaseMoveTime += ((CMouseEvent) keyboardEventsList.get(i)).getTimeReleaseMove();
-				maxReleaseMoveTime = CParserUtils.getMax(maxReleaseMoveTime, ((CMouseEvent) keyboardEventsList.get(i)).getTimeReleaseMove());
-				minReleaseMoveTime = CParserUtils.getMin(minReleaseMoveTime, ((CMouseEvent) keyboardEventsList.get(i)).getTimeReleaseMove());
-				
-				count++;
-			}
-			else
-			{
-				if(count < EVENTS_COUNT)
-				{
-					//incomplete = true;
-				}
-				else
-				{
-					
-					writer.append(""+personName);
-					writer.append(",");
-					writer.append(""+wsession);
-					writer.append(",");
-					writer.append(""+emotion);
-					writer.append(",");
-					
-					writer.append(""+avgAcceleration / EVENTS_COUNT);
-					writer.append(",");
-					writer.append(""+maxAcceleration);
-					writer.append(",");
-					writer.append(""+minAcceleration);
-					writer.append(",");
-					writer.append(""+avgAngleDifference / EVENTS_COUNT);
-					writer.append(",");
-					writer.append(""+maxAngleDifference);
-					writer.append(",");
-					writer.append(""+minAngleDifference);
-					writer.append(",");
-					writer.append(""+maxAvgAngleDifference);
-					writer.append(",");
-					writer.append(""+avgLineDistance / EVENTS_COUNT);
-					writer.append(",");
-					writer.append(""+maxLineDistance);
-					writer.append(",");
-					writer.append(""+minAvgLineDistance);
-					writer.append(",");
-					writer.append(""+maxAvgLineDistance);
-					writer.append(",");
-					writer.append(""+avgSpeed / EVENTS_COUNT);
-					writer.append(",");
-					writer.append(""+maxSpeed);
-					writer.append(",");
-					writer.append(""+minSpeed);
-					writer.append(",");
-					writer.append(""+avgDirectionChanges / EVENTS_COUNT);
-					writer.append(",");
-					writer.append(""+maxDirectionChanges);
-					writer.append(",");
-					writer.append(""+minDirectionChanges);
-					writer.append(",");
-					writer.append(""+avgFirstClickHoldTime / EVENTS_COUNT);
-					writer.append(",");
-					writer.append(""+maxFirstClickHoldTime);
-					writer.append(",");
-					writer.append(""+minFirstClickHoldTime);
-					writer.append(",");
-					writer.append(""+avgIntersections / EVENTS_COUNT);
-					writer.append(",");
-					writer.append(""+maxIntersections);
-					writer.append(",");
-					writer.append(""+minIntersections);
-					writer.append(",");
-					writer.append(""+maxMultiClicks);
-					writer.append(",");
-					writer.append(""+avgMultiClicks / EVENTS_COUNT);
-					writer.append(",");
-					writer.append(""+timeAvg);
-					writer.append(",");
-					writer.append(""+timeMax);
-					writer.append(",");
-					writer.append(""+timeMin);
-					writer.append(",");
-					writer.append(""+avgClickMoveTime / EVENTS_COUNT);
-					writer.append(",");
-					writer.append(""+maxClickMoveTime);
-					writer.append(",");
-					writer.append(""+minClickMoveTime);
-					writer.append(",");
-					writer.append(""+avgMoveClickTime / EVENTS_COUNT);
-					writer.append(",");
-					writer.append(""+maxMoveClickTime);
-					writer.append(",");
-					writer.append(""+minMoveClickTime);
-					writer.append(",");
-					writer.append(""+avgMoveReleaseTime / EVENTS_COUNT);
-					writer.append(",");
-					writer.append(""+maxMoveReleaseTime);
-					writer.append(",");
-					writer.append(""+minMoveReleaseTime);
-					writer.append(",");
-					writer.append(""+avgReleaseMoveTime / EVENTS_COUNT);
-					writer.append(",");
-					writer.append(""+maxReleaseMoveTime);
-					writer.append(",");
-					writer.append(""+minReleaseMoveTime);
-					writer.append('\n');
-					
-					personName = null;
-					wsession = null;
-					emotion = null;
-					
-					avgAcceleration = 0;
-					maxAcceleration = 0;
-					minAcceleration = Double.MAX_VALUE;
-						
-					avgAngleDifference = 0;
-					maxAngleDifference = 0;
-					minAngleDifference = Double.MAX_VALUE;
-					maxAvgAngleDifference = 0;
-
-					avgLineDistance = 0;
-					maxLineDistance = 0;
-					minAvgLineDistance = Double.MAX_VALUE;
-					maxAvgLineDistance = 0;
-
-					avgSpeed = 0;
-					maxSpeed = 0;
-					minSpeed = Double.MAX_VALUE;
-
-					avgDirectionChanges = 0;
-					maxDirectionChanges = 0;
-					minDirectionChanges = Integer.MAX_VALUE;
-
-					avgFirstClickHoldTime = 0;
-					maxFirstClickHoldTime = 0;
-					minFirstClickHoldTime = Long.MAX_VALUE;
-
-					avgIntersections = 0;
-					maxIntersections = 0;
-					minIntersections = Integer.MAX_VALUE;
-
-					maxMultiClicks = 0;
-					avgMultiClicks = 0;
-
-					timeAvg = 0;
-					timeMax = 0;
-					timeMin = Double.MAX_VALUE;
-
-					avgClickMoveTime = 0;
-					maxClickMoveTime = 0;
-					minClickMoveTime = Long.MAX_VALUE;
-						
-					avgMoveClickTime = 0;
-					maxMoveClickTime = 0;
-					minMoveClickTime = Long.MAX_VALUE;;
-						
-					avgMoveReleaseTime = 0;
-					maxMoveReleaseTime = 0;
-					minMoveReleaseTime = Long.MAX_VALUE;;
-						
-					avgReleaseMoveTime = 0;
-					maxReleaseMoveTime = 0;
-					minReleaseMoveTime = Long.MAX_VALUE;
-					
-				}
-					
-				count = 0;
-			}									
-		}
+		writer.append(""+keyboardEventsList.get(0).getUserName());
+		writer.append(",");
+		/*writer.append(""+wsession);
+		writer.append(",");*/
+		writer.append(""+keyboardEventsList.get(0).getEmotion());
+		writer.append(",");
 		
+		writer.append(""+dwellTimeAvg/keyboardEventsList.size());
+		writer.append(""+dwellTimeMin);
+		writer.append(""+dwellTimeMax);
+		writer.append(""+minDigraphPP);
+		writer.append(""+minDigraphPR);
+		writer.append(""+minDigraphRP);
+		writer.append(""+minDigraphRR);
+		writer.append(""+minTrigraphPP);
+		writer.append(""+minTrigraphPR);
+		writer.append(""+minTrigraphRP);
+		writer.append(""+minTrigraphRR);
+		writer.append(""+minWordDigraphPP);
+		writer.append(""+minWordDigraphPR);
+		writer.append(""+minWordDigraphRP);
+		writer.append(""+minWordDigraphRR);
+		writer.append(""+maxDigraphPP);
+		writer.append(""+maxDigraphPR);
+		writer.append(""+maxDigraphRP);
+		writer.append(""+maxDigraphRR);
+		writer.append(""+maxTrigraphPP);
+		writer.append(""+maxTrigraphPR);
+		writer.append(""+maxTrigraphRP);
+		writer.append(""+maxTrigraphRR);
+		writer.append(""+maxWordDigraphPP);
+		writer.append(""+maxWordDigraphPR);
+		writer.append(""+maxWordDigraphRP);
+		writer.append(""+maxWordDigraphRR);
+		writer.append(""+avgDigraphPP/timesDigraph);
+		writer.append(""+avgDigraphPR/timesDigraph);
+		writer.append(""+avgDigraphRP/timesDigraph);
+		writer.append(""+avgDigraphRR/timesDigraph);
+		writer.append(""+avgTrigraphPP/timesTrigraph);
+		writer.append(""+avgTrigraphPR/timesTrigraph);
+		writer.append(""+avgTrigraphRP/timesTrigraph);
+		writer.append(""+avgTrigraphRR/timesTrigraph);
+		writer.append(""+avgWordDigraphPP/timesWordgraph);
+		writer.append(""+avgWordDigraphPR/timesWordgraph);
+		writer.append(""+avgWordDigraphRP/timesWordgraph);
+		writer.append(""+avgWordDigraphRR/timesWordgraph);
+		writer.append(""+pauseTimesTotal);
+		writer.append(""+maxPauseTime);
+		writer.append(""+minPauseTime);
+		writer.append(""+avgPauseTime/pauseCount);
+		writer.append(""+maxWindowTime);
+		writer.append(""+minWindowTime);
+		writer.append(""+avgWindowTime);
+		writer.append(""+charPerSecond);
+		writer.append(""+charPerSecondMax);
+		writer.append(""+charPerSecondAvg/timesCharPerSecond);
+		writer.append(""+modifiersMax);
+		writer.append(""+modifiersTotal);
+		writer.append(""+misstakesTotal);
+		writer.append(""+misstakesMax);
+		writer.append(""+pauseCount);
+		writer.append(""+windowSwitchedCount);
+		
+		
+		writer.append('\n');
+			
 		writer.close();
 	}
 	
-	private static void writeFileHeaders (FileWriter writer) throws IOException
+	private static void writeFileHeaders (FileWriter writter) throws IOException
 	{		
 		
-		writer.append("name");
-		writer.append(",");
-		writer.append("session");
-		writer.append(",");
-		writer.append("emotion");
-		writer.append(",");
+		writter.append("name");
+		writter.append(",");
+		writter.append("emotion");
+		writter.append(",");
 		
-		writer.append("avgAcceleration");
-		writer.append(",");
-		writer.append("maxAcceleration");
-		writer.append(",");
-		writer.append("minAcceleration");
-		writer.append(",");
-		writer.append("avgAngleDifference");
-		writer.append(",");
-		writer.append("maxAngleDifference");
-		writer.append(",");
-		writer.append("minAngleDifference");
-		writer.append(",");
-		writer.append("maxAvgAngleDifference");
-		writer.append(",");
-		writer.append("avgLineDistance");
-		writer.append(",");
-		writer.append("maxLineDistance");
-		writer.append(",");
-		writer.append("minAvgLineDistance");
-		writer.append(",");
-		writer.append("maxAvgLineDistance");
-		writer.append(",");
-		writer.append("avgSpeed");
-		writer.append(",");
-		writer.append("maxSpeed");
-		writer.append(",");
-		writer.append("minSpeed");
-		writer.append(",");
-		writer.append("avgDirectionChanges");
-		writer.append(",");
-		writer.append("maxDirectionChanges");
-		writer.append(",");
-		writer.append("minDirectionChanges");
-		writer.append(",");
-		writer.append("avgFirstClickHoldTime");
-		writer.append(",");
-		writer.append("maxFirstClickHoldTime");
-		writer.append(",");
-		writer.append("minFirstClickHoldTime");
-		writer.append(",");
-		writer.append("avgIntersections");
-		writer.append(",");
-		writer.append("maxIntersections");
-		writer.append(",");
-		writer.append("minIntersections");
-		writer.append(",");
-		writer.append("maxMultiClicks");
-		writer.append(",");
-		writer.append("avgMultiClicks");
-		writer.append(",");
-		writer.append("timeAvg");
-		writer.append(",");
-		writer.append("timeMax");
-		writer.append(",");
-		writer.append("timeMin");
-		writer.append(",");
-		writer.append("avgClickMoveTime");
-		writer.append(",");
-		writer.append("maxClickMoveTime");
-		writer.append(",");
-		writer.append("minClickMoveTime");
-		writer.append(",");
-		writer.append("avgMoveClickTime");
-		writer.append(",");
-		writer.append("maxMoveClickTime");
-		writer.append(",");
-		writer.append("minMoveClickTime");
-		writer.append(",");
-		writer.append("avgMoveReleaseTime");
-		writer.append(",");
-		writer.append("maxMoveReleaseTime");
-		writer.append(",");
-		writer.append("minMoveReleaseTime");
-		writer.append(",");
-		writer.append("avgReleaseMoveTime");
-		writer.append(",");
-		writer.append("maxReleaseMoveTime");
-		writer.append(",");
-		writer.append("minReleaseMoveTime");
-		writer.append('\n');
+		writter.append("dwellTimeAvg");
+		writter.append(",");
+		writter.append("dwellTimeMin");
+		writter.append(",");
+		writter.append("dwellTimeMax");
+		writter.append(",");		
+		writter.append("minDigraphPP");
+		writter.append(",");
+		writter.append("minDigraphPR");
+		writter.append(",");
+		writter.append("minDigraphRP");
+		writter.append(",");
+		writter.append("minDigraphRR");
+		writter.append(",");
+		writter.append("minTrigraphPP");
+		writter.append(",");
+		writter.append("minTrigraphPR");
+		writter.append(",");
+		writter.append("minTrigraphRP");
+		writter.append(",");
+		writter.append("minTrigraphRR");
+		writter.append(",");
+		writter.append("minWordDigraphPP");
+		writter.append(",");
+		writter.append("minWordDigraphPR");
+		writter.append(",");
+		writter.append("minWordDigraphRP");
+		writter.append(",");
+		writter.append("minWordDigraphRR");
+		writter.append(",");
+		writter.append("maxDigraphPP");
+		writter.append(",");
+		writter.append("maxDigraphPR");
+		writter.append(",");
+		writter.append("maxDigraphRP");
+		writter.append(",");
+		writter.append("maxDigraphRR");
+		writter.append(",");
+		writter.append("maxTrigraphPP");
+		writter.append(",");
+		writter.append("maxTrigraphPR");
+		writter.append(",");
+		writter.append("maxTrigraphRP");
+		writter.append(",");
+		writter.append("maxTrigraphRR");
+		writter.append(",");
+		writter.append("maxWordDigraphPP");
+		writter.append(",");
+		writter.append("maxWordDigraphPR");
+		writter.append(",");
+		writter.append("maxWordDigraphRP");
+		writter.append(",");
+		writter.append("maxWordDigraphRR");
+		writter.append(",");
+		writter.append("avgDigraphPP");
+		writter.append(",");
+		writter.append("avgDigraphPR");
+		writter.append(",");
+		writter.append("avgDigraphRP");
+		writter.append(",");
+		writter.append("avgDigraphRR");
+		writter.append(",");
+		writter.append("avgTrigraphPP");
+		writter.append(",");
+		writter.append("avgTrigraphPR");
+		writter.append(",");
+		writter.append("avgTrigraphRP");
+		writter.append(",");
+		writter.append("avgTrigraphRR");
+		writter.append(",");
+		writter.append("avgWordDigraphPP");
+		writter.append(",");
+		writter.append("avgWordDigraphPR");
+		writter.append(",");
+		writter.append("avgWordDigraphRP");
+		writter.append(",");
+		writter.append("avgWordDigraphRR");
+		writter.append(",");
+		writter.append("pauseTimesTotal");
+		writter.append(",");
+		writter.append("maxPauseTime");
+		writter.append(",");
+		writter.append("minPauseTime");
+		writter.append(",");
+		writter.append("avgPauseTime");
+		writter.append(",");
+		writter.append("maxWindowTime");
+		writter.append(",");
+		writter.append("minWindowTime");
+		writter.append(",");
+		writter.append("avgWindowTime");
+		writter.append(",");
+		writter.append("charPerSecond");
+		writter.append(",");
+		writter.append("charPerSecondMax");
+		writter.append(",");
+		writter.append("charPerSecondAvg");
+		writter.append(",");
+		writter.append("modifiersMax");
+		writter.append(",");
+		writter.append("modifiersAvg");
+		writter.append(",");
+		writter.append("misstakesTotal");
+		writter.append(",");
+		writter.append("misstakesMax");
+		writter.append(",");
+		writter.append("pauseCount");
+		writter.append(",");
+		writter.append("windowSwitchedCount");
+		writter.append('\n');
 	}
 }

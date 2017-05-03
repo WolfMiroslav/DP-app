@@ -48,6 +48,7 @@ public class CWritter {
 		CWritter.focusedWindow = CUtils.MD5(focusedWindow.toCharArray());
 	}	
 	
+	/*
 	private static synchronized void checkInactivity ()
 	{
 		Long timeFromLastActivity = (System.currentTimeMillis() - lastAction);
@@ -59,7 +60,7 @@ public class CWritter {
 			writeText("INACTIVITY_TIME="+timeFromLastActivity);
 		}
 		lastAction = System.currentTimeMillis();
-	}
+	}*/
 	
 	public void setEmotion(String emotion) {
 		

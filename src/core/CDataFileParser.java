@@ -56,8 +56,8 @@ public class CDataFileParser {
 				
 		}
 		
-		CMouseCharacteristicsFileWritter.calculateCharacteristics(mouseEventsList);
-		CKeyboardCharacteristicsFileWritter.calculateCharacteristics(keyboardEventsList);
+		CMouseCharacteristicsFileWritter.calculateCharacteristics(mouseEventsList, pauseTimeList, windowSwitchedTimeList);
+		CKeyboardCharacteristicsFileWritter.calculateCharacteristics(keyboardEventsList, pauseTimeList, windowSwitchedTimeList);
 				
 		testingPrint();
 		

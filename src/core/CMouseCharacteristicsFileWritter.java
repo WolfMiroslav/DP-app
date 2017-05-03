@@ -13,72 +13,113 @@ public class CMouseCharacteristicsFileWritter {
 	private final static int EVENTS_COUNT = 10;
 	
 	
-	public static void calculateCharacteristics(List<CEvent> mouseEventsList) throws IOException
+	public static void calculateCharacteristics(List<CEvent> mouseEventsList, List<Long> pauseTimeList, List<Long> windowSwitchedTimeList) throws IOException
 	{
 		int count = 0;
 		//boolean incomplete = false;
 		
-		String personName = null;
-		String wsession = null;
-		String emotion = null;
+		String 	personName = null,
+				wsession = null,
+				emotion = null;		
 		
+		double 	avgAcceleration = 0,
+		 		maxAcceleration = 0,
+		 		minAcceleration = Double.MAX_VALUE,
 		
-		double avgAcceleration = 0;
-		double maxAcceleration = 0;
-		double minAcceleration = Double.MAX_VALUE;
+				avgAngleDifference = 0,
+				maxAngleDifference = 0,
+				minAngleDifference = Double.MAX_VALUE,
+				maxAvgAngleDifference = 0,
 		
-		double avgAngleDifference = 0;
-		double maxAngleDifference = 0;
-		double minAngleDifference = Double.MAX_VALUE;
-		double maxAvgAngleDifference = 0;
+				avgLineDistance = 0,
+				maxLineDistance = 0,
+				minAvgLineDistance = Double.MAX_VALUE,
+				maxAvgLineDistance = 0,
 		
-		double avgLineDistance = 0;
-		double maxLineDistance = 0;
-		double minAvgLineDistance = Double.MAX_VALUE;
-		double maxAvgLineDistance = 0;
+				avgSpeed = 0,
+				maxSpeed = 0,
+				minSpeed = Double.MAX_VALUE,
 		
-		double avgSpeed = 0;
-		double maxSpeed = 0;
-		double minSpeed = Double.MAX_VALUE;
-		
-		double avgDirectionChanges = 0;
-		int maxDirectionChanges = 0;
-		int minDirectionChanges = Integer.MAX_VALUE;
-		
-		double avgFirstClickHoldTime = 0;
-		long maxFirstClickHoldTime = 0;
-		long minFirstClickHoldTime = Long.MAX_VALUE;
-		
-		double avgIntersections = 0;
-		int maxIntersections = 0;
-		int minIntersections = Integer.MAX_VALUE;
-		
-		int maxMultiClicks = 0;
-		double avgMultiClicks = 0;
-		
-		double timeAvg = 0;
-		double timeMax = 0;
-		double timeMin = Double.MAX_VALUE;
-		
-		double avgClickMoveTime = 0;
-		long maxClickMoveTime = 0;
-		long minClickMoveTime = Long.MAX_VALUE;
-		
-		double avgMoveClickTime = 0;
-		long maxMoveClickTime = 0;
-		long minMoveClickTime = Long.MAX_VALUE;
-		
-		double avgMoveReleaseTime = 0;
-		long maxMoveReleaseTime = 0;
-		long minMoveReleaseTime = Long.MAX_VALUE;
-		
-		double avgReleaseMoveTime = 0;
-		long maxReleaseMoveTime = 0;
-		long minReleaseMoveTime = Long.MAX_VALUE;
+				avgDirectionChanges = 0,
 				
-		FileWriter writer = new FileWriter("result/newdata.csv");
-		writeFileHeaders(writer);
+				avgFirstClickHoldTime = 0;
 		
+		int 	maxDirectionChanges = 0,
+				minDirectionChanges = Integer.MAX_VALUE;
+		
+		
+		long 	maxFirstClickHoldTime = 0,
+				minFirstClickHoldTime = Long.MAX_VALUE;
+		
+		double 	avgIntersections = 0;
+		int 	maxIntersections = 0,
+				minIntersections = Integer.MAX_VALUE;
+		
+		int 	maxMultiClicks = 0;
+		double 	avgMultiClicks = 0,
+		
+				timeAvg = 0,
+				timeMax = 0,
+				timeMin = Double.MAX_VALUE,
+		
+				avgClickMoveTime = 0;
+		
+		long 	maxClickMoveTime = 0,
+				minClickMoveTime = Long.MAX_VALUE;
+		
+		double 	avgMoveClickTime = 0;
+		long 	maxMoveClickTime = 0,
+				minMoveClickTime = Long.MAX_VALUE;
+		
+		double 	avgMoveReleaseTime = 0;
+		long 	maxMoveReleaseTime = 0,
+				minMoveReleaseTime = Long.MAX_VALUE;
+		
+		double 	avgReleaseMoveTime = 0;
+		long 	maxReleaseMoveTime = 0,
+				minReleaseMoveTime = Long.MAX_VALUE,
+						
+				pauseTimesTotal = 0,
+				maxPauseTime = 0,
+				minPauseTime = Long.MAX_VALUE,
+				avgPauseTime = 0;			
+		
+		int 	pauseCount = pauseTimeList.size(),
+				windowSwitchedCount = windowSwitchedTimeList.size();
+		
+		long	maxWindowTime = 0,
+				minWindowTime = Long.MAX_VALUE,
+				avgWindowTime = 0;
+						
+		
+		
+		FileWriter writer = new FileWriter("result/newdata.csv");
+		writeFileHeaders(writer);		
+		
+		for(int i=0; i<pauseTimeList.size(); i++)
+		{
+			pauseTimesTotal += pauseTimeList.get(i);
+			maxPauseTime = CParserUtils.getMax(maxPauseTime, pauseTimeList.get(i));
+			minPauseTime = CParserUtils.getMin(minPauseTime, pauseTimeList.get(i));
+		}
+		
+		for(int i=0; i<windowSwitchedTimeList.size(); i++)
+		{
+			avgWindowTime += windowSwitchedTimeList.get(i);
+			maxWindowTime = CParserUtils.getMax(maxWindowTime, windowSwitchedTimeList.get(i));
+			minWindowTime = CParserUtils.getMin(minWindowTime, windowSwitchedTimeList.get(i));
+		}
+		
+		if(!pauseTimeList.isEmpty())
+		{
+			avgPauseTime = pauseTimesTotal / pauseTimeList.size();
+		}
+		
+		if(!windowSwitchedTimeList.isEmpty())
+		{
+			avgWindowTime = avgWindowTime/ windowSwitchedTimeList.size();
+		}	
+				
 		for(int i=0; i<mouseEventsList.size(); i++)
 		{
 			

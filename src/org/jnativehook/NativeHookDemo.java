@@ -49,7 +49,6 @@ import javax.swing.JRadioButton;
 import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
 import javax.swing.WindowConstants;
-import javax.swing.event.EventListenerList;
 import javax.swing.text.BadLocationException;
 
 import org.jnativehook.keyboard.NativeKeyEvent;
@@ -64,11 +63,11 @@ import com.sun.jna.Pointer;
 import com.sun.jna.platform.win32.WinDef.HWND;
 import com.sun.jna.ptr.PointerByReference;
 
-import core.CDataCollecting;
 import core.CExperimentTimer;
 import core.CWritter;
 import enums.EEmotionEnum;
 import utils.CAppConstants;
+import utils.CUtils;
 
 /**
  * A demonstration of how to use the JNativeHook library.
@@ -103,9 +102,9 @@ public class NativeHookDemo extends JFrame implements ActionListener, ItemListen
 	/** The text area to display event info. */
 	private JTextArea txtEventInfo;
 	
-	private JRadioButton positive = new JRadioButton("Pozit�vna");;
-    private JRadioButton neutral = new JRadioButton("Neutr�lna");;
-    private JRadioButton negative = new JRadioButton("Negat�vna");;
+	private JRadioButton positive = new JRadioButton(CAppConstants.POSITIVE_STR);
+    private JRadioButton neutral = new JRadioButton(CAppConstants.NEUTRAL_STR);
+    private JRadioButton negative = new JRadioButton(CAppConstants.NEGATIVE_STR);
 
 	/** Logging */
 	private static final Logger logger = Logger.getLogger(GlobalScreen.class.getPackage().getName());
@@ -229,7 +228,7 @@ public class NativeHookDemo extends JFrame implements ActionListener, ItemListen
 		txtEventInfo.setForeground(new Color(0x00, 0x00, 0x00));
 		txtEventInfo.setText("");
 		
-		EventListenerList eventList = GlobalScreen.getEventListenerList();
+		//EventListenerList eventList = GlobalScreen.getEventListenerList();
 		/*info = new JTextArea();
 		info.setEditable(false);
 		info.setBackground(new Color(0xFF, 0xFF, 0xFF));
@@ -399,15 +398,16 @@ public class NativeHookDemo extends JFrame implements ActionListener, ItemListen
 	 */
 	public void nativeKeyPressed(NativeKeyEvent e) {
 		
-		for(Object o : GlobalScreen.getEventListenerList().getListenerList())
+		/*for(Object o : GlobalScreen.getEventListenerList().getListenerList())
 		{
 			//info.append("\n"+o.toString());
-		}
+		}*/
 		
 		dataCollector.setFocusedWindow(getFocusedWindow());
 		
 		displayEventInfo(e);
-		dataCollector.writeToFile(e);
+		CWritter.getInstance();
+		CWritter.writeToFile(e);
 	}
 
 	/**
@@ -417,7 +417,8 @@ public class NativeHookDemo extends JFrame implements ActionListener, ItemListen
 		dataCollector.setFocusedWindow(getFocusedWindow());
 		
 		displayEventInfo(e);
-		dataCollector.writeToFile(e);
+		CWritter.getInstance();
+		CWritter.writeToFile(e);
 	}
 
 	/**
@@ -427,7 +428,8 @@ public class NativeHookDemo extends JFrame implements ActionListener, ItemListen
 		dataCollector.setFocusedWindow(getFocusedWindow());
 		
 		displayEventInfo(e);
-		dataCollector.writeToFile(e);
+		CWritter.getInstance();
+		CWritter.writeToFile(e);
 	}
 
 	/**
@@ -437,7 +439,8 @@ public class NativeHookDemo extends JFrame implements ActionListener, ItemListen
 		dataCollector.setFocusedWindow(getFocusedWindow());
 		
 		displayEventInfo(e);
-		dataCollector.writeToFile(e);
+		CWritter.getInstance();
+		CWritter.writeToFile(e);
 	}
 
 	/**
@@ -447,7 +450,8 @@ public class NativeHookDemo extends JFrame implements ActionListener, ItemListen
 		dataCollector.setFocusedWindow(getFocusedWindow());
 		
 		displayEventInfo(e);
-		dataCollector.writeToFile(e);
+		CWritter.getInstance();
+		CWritter.writeToFile(e);
 	}
 
 	/**
@@ -457,7 +461,8 @@ public class NativeHookDemo extends JFrame implements ActionListener, ItemListen
 		dataCollector.setFocusedWindow(getFocusedWindow());
 		
 		displayEventInfo(e);
-		dataCollector.writeToFile(e);
+		CWritter.getInstance();
+		CWritter.writeToFile(e);
 	}
 
 	/**
@@ -467,7 +472,8 @@ public class NativeHookDemo extends JFrame implements ActionListener, ItemListen
 		dataCollector.setFocusedWindow(getFocusedWindow());
 		
 		displayEventInfo(e);
-		dataCollector.writeToFile(e);
+		CWritter.getInstance();
+		CWritter.writeToFile(e);
 	}
 
 	/**
@@ -477,7 +483,8 @@ public class NativeHookDemo extends JFrame implements ActionListener, ItemListen
 		dataCollector.setFocusedWindow(getFocusedWindow());
 		
 		displayEventInfo(e);
-		dataCollector.writeToFile(e);
+		CWritter.getInstance();
+		CWritter.writeToFile(e);
 	}
 
 	/**
@@ -487,7 +494,8 @@ public class NativeHookDemo extends JFrame implements ActionListener, ItemListen
 		dataCollector.setFocusedWindow(getFocusedWindow());
 		
 		displayEventInfo(e);
-		dataCollector.writeToFile(e);
+		CWritter.getInstance();
+		CWritter.writeToFile(e);
 	}
 
 	/**
@@ -675,7 +683,8 @@ public class NativeHookDemo extends JFrame implements ActionListener, ItemListen
         
         if(currentFocusedWindow == null || !currentFocusedWindow.equals(Native.toString(buffer))){
         	currentFocusedWindow = Native.toString(buffer);
-        	dataCollector.writeText("Active window title: " + CDataCollecting.MD5(currentFocusedWindow));        	
+        	CWritter.getInstance();
+        	CWritter.writeText("Active window title: " + CUtils.MD5(currentFocusedWindow.toCharArray()));        	
         }
         
         return currentFocusedWindow;

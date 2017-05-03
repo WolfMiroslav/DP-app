@@ -11,6 +11,7 @@ import java.nio.charset.Charset;
 import org.jnativehook.NativeInputEvent;
 
 import utils.CAppConstants;
+import utils.CUtils;
 
 public class CDataCollecting {
 	private static CDataCollecting dataCollecting;
@@ -127,25 +128,9 @@ public class CDataCollecting {
 	}
 	
 	public void setFocusedWindow(String focusedWindow) {
-		this.focusedWindow = MD5(focusedWindow);
+		this.focusedWindow = CUtils.MD5(focusedWindow.toCharArray());
 	}	
 	
-	public static String MD5(String md5) {
-		try {
-			java.security.MessageDigest md = java.security.MessageDigest.getInstance("MD5");
-			byte[] array = md.digest(md5.getBytes(Charset.forName("UTF-8")));
-		    StringBuffer sb = new StringBuffer();
-		    for (int i = 0; i < array.length; ++i) {
-		    	sb.append(Integer.toHexString((array[i] & 0xFF) | 0x100).substring(1,3));
-		    }
-		    return sb.toString();
-		} 
-		catch (java.security.NoSuchAlgorithmException e) 
-		{
-			e.printStackTrace();
-		}
-		return null;
-	}
 	
 	public void setEmotion(String emotion) {
 		
